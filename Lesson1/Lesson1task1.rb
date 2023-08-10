@@ -4,12 +4,12 @@ puts "Hello there! I will be happy to tell your perfect weight. What is your nam
 name = gets.chomp
 
 puts "What is your height, #{name}?"
-height = gets.chomp
+height = gets.chomp.to_f
 
 # Check if inserted user data is correct
-if height.to_i.to_s == height || height.to_f.to_s == height
-  perfectweight = (height.to_f - 110) * 1.15
-  puts "So #{name}, your perfect weight is #{perfectweight}."
+if height != 0.0
+    perfectweight = (height - 110.0) * 1.15
+    puts "So #{name}, your perfect weight is #{perfectweight}."
 else
-  puts "Invalid input for height. Please enter a valid number."
+    puts "Invalid input for height. Please enter a valid number."
 end
