@@ -64,16 +64,13 @@ products.each do |product, details|
 end
 
 # Total purchases in the basket
-puts "Total purchases in the basket:"
+total_purchase = 0
 products.each do |product, details|
-  puts "Product: #{product}"
   price_per_unit = details["Price per unit"]
   quantity = details["Quantity"]
   total_price = price_per_unit * quantity
-  
-  puts "Price per unit: #{price_per_unit}"
-  puts "Quantity: #{quantity}"
-  puts "Total price: #{total_price}"
-  
-  puts "-" * 20
+  total_purchase += total_price
 end
+
+puts "Total purchases in the basket: #{total_purchase}"
+
