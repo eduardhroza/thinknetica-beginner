@@ -10,7 +10,6 @@ Lesson 2 task 5
 Вычислить и вывести на экран итоговую сумму всех покупок в "корзине".
 =end
 
-basket = {}
 products = {}
 
 loop do
@@ -48,7 +47,7 @@ products.each do |product, details|
 end
 
 # Total for each item
-puts "Total for each item"
+puts "Total for each item:"
 products.each do |product, details|
   puts "Product: #{product}"
   price_per_unit = details["Price per unit"]
@@ -65,7 +64,7 @@ products.each do |product, details|
 end
 
 # Total purchases in the basket
-puts "Total purchases in the basket"
+puts "Total purchases in the basket:"
 products.each do |product, details|
   puts "Product: #{product}"
   price_per_unit = details["Price per unit"]
