@@ -10,12 +10,12 @@ class Station
 
   def initialize(name) # Запрашиваем имя станции.
     @name = name 
-    @trains = {} # Здесь будут храниться все поезда на станции.
+    @trains = [] # Теперь здесь хранится массив всех поездов на станции.
   end
 
-  def add_train(train_number, train_type) # Добавляем поезд по его ноvереу и типу "Passenger" || "Cargo".
-    @trains[train_number] = train_type
-    puts "Accepted a #{train_type} train with number #{train_number}"
+  def add_train(train) # Теперь просто передаем объект поезда.
+    @trains << train
+    puts "Accepted a #{train.type} train with number #{train.number}"
   end
 
   def show_all_trains
@@ -23,28 +23,27 @@ class Station
       puts "No trains at the station."
     else
       puts "Trains at #{@name} station:"
-      @trains.each do |train_number, train_type| # Создаем блок для отображения всех поездов и их типов
-        puts "Train type: #{train_type}, Number: #{train_number}"
+      @trains.each do |train|
+        puts "Train type: #{train.type}, Number: #{train.number}"
       end
     end
   end
 
-  def trains_by_type(type) 
-    type_trains = @trains.select { |_, train_type| train_type == type } # Отображение поездов только по типу "Passenger" || "Cargo".
-    if type_trains.empty?
-      puts "No #{type} trains at the station."
-    else
-      puts "Trains of type #{type} at #{@name} station:"
-      type_trains.each do |train_number, _|
-        puts "Train Number: #{train_number}"
-      end
+  def trains_by_type(type)
+    selected_trains = @trains.select { |train| train.type == type }
+    puts "Trains of type #{type} at #{@name} station:"
+    selected_trains.each do |train|
+      puts "Train Number: #{train.number}"
     end
+    puts "Total count: #{selected_trains.count}"
+    selected_trains
   end
-
-  def send_train(train_number) # Отправить поезд со станции.
-    if @trains.key?(train_number) # Проверка если такой поезд есть, то отправляем.
-      train_type = @trains.delete(train_number) # Отправленный поезд больше не находится на станции.
-      puts "Sent a #{train_type} train with number #{train_number}"
+  
+  def send_train(train_number)
+    train = @trains.find { |train| train.number == train_number }
+    if train
+      @trains.delete(train)
+      puts "Sent a #{train.type} train with number #{train.number}"
     else
       puts "Train with number #{train_number} not found at the station."
     end

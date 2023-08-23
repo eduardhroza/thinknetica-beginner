@@ -21,6 +21,6 @@ class Route
 
   def display_stations
     puts "Stations:"
-    @stations.each { |station| puts station }
+    @stations.each { |station| puts station.name }
   end
 end
