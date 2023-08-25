@@ -6,7 +6,8 @@
 # - Может выводить список всех станций по-порядку от начальной до конечной.
 
 class Route
-
+  attr_reader :stations
+  
   def initialize(first_station, last_station)
     @stations = [first_station, last_station]
   end

@@ -81,6 +81,11 @@ class Route
   def initialize(stations)
     @stations = stations
   end
+
+  def station_list
+    @stations
+  end
+  
 end
 
 class Station
