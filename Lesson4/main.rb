@@ -270,10 +270,10 @@ def move_train
 
             if user_selection == 1
                 selected_train.move_forward
-                puts "Train #{selected_train.number} has arrived to #{selected_train.current_station.name} the station."
+                puts "Train #{selected_train.number} has arrived to #{selected_train.current_station.name} station."
             elsif user_selection == 2
                 selected_train.move_backward
-                puts "Train #{selected_train.number} has arrived to the #{selected_train.current_station.name} station."
+                puts "Train #{selected_train.number} has arrived to #{selected_train.current_station.name} station."
             elsif user_selection == 3
                 menu
             else puts "Wrong selection."
@@ -287,6 +287,8 @@ def show_all
     if $user_stations.empty? && $user_trains.empty?
         puts "No stations and trains available."
         menu
+    elsif $user_stations.empty? && !$user_trains.empty?
+        puts "No stations available, trains are at the depot."
     else
         $user_stations.each do |station|
             puts "Station: #{station.name}"
