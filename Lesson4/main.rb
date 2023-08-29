@@ -7,17 +7,15 @@ require_relative 'cart'
 require_relative 'cart_passenger'
 require_relative 'cart_cargo'
 
-$user_trains = []
-$user_routes_storage = []
-$user_stations = []
-$user_carts = []
+$user_trains = [] #Поезда
+$user_routes_storage = [] #Маршруты
+$user_stations = [] #Станции
+$user_carts = [] #Вагоны
 
 # В моём коде вагоны (Wagons) я прописываю как "Cart/carts (вагонетки), так как вагон технически не бывает грузовым, это грузовая вагонетка."
 
 =begin
-- Назначать маршрут поезду
 - Перемещать поезд по маршруту вперед и назад
-- Просматривать список станций и список поездов на станции
 =end
 
 
@@ -27,10 +25,9 @@ def menu
     2  -  Create a train.
     3  -  Wagons management
     4  -  Assign route for a train
-    ##############################################################
     5  -  Move train
     6  -  Show all stations and list of trains on the stations.
-    9  -  Exit"
+    7  -  Exit"
 end
 
 def station_and_route_management
@@ -47,26 +44,27 @@ def station_and_route_management
       
         if sub_menu_selection == 1 # Create route.
           puts "Please assign departure station:"
-          first_station = gets.chomp
+          first_station = Station.new(gets.chomp)
           puts "Please assign final station:"
-          last_station = gets.chomp
+          last_station = Station.new(gets.chomp)
           user_routes = Route.new(first_station, last_station)
           $user_routes_storage << user_routes
           puts "Route #{user_routes} has been added."
 
         elsif sub_menu_selection == 2 # Create station.
           puts "Please enter the name of your station:"
-          $user_stations << gets.chomp
-          puts "Station #{$user_stations.last} has been added."
+          $user_stations << Station.new(gets.chomp)
+          puts "Station #{$user_stations.last.name} has been added."
 
         elsif sub_menu_selection == 3 # Operate routes.
             if $user_routes_storage.empty?
                 puts "No routes available"
-                break
+                station_and_route_management
             else
                 puts "Please select a route:"
                 $user_routes_storage.each_with_index do |route, index|
-                    puts "#{index + 1} - #{route.stations}"
+                  station_names = route.stations.map(&:name).join(' -> ') # Чтоб на экран выводились имена станций.
+                  puts "#{index + 1} - #{station_names}"
                 end
             end
 
@@ -74,38 +72,44 @@ def station_and_route_management
             if route_selection > 0 && route_selection <= $user_routes_storage.size
                 selected_route = $user_routes_storage[route_selection -1]
 
-                puts "Selected route: #{selected_route.stations.join(' -> ')}"
+                puts "Selected route: #{selected_route.stations.map(&:name).join(' -> ')}"
             
                 puts "Please select the required action:
                 1  -  Add station.
-                2  -  Remove station."
+                2  -  Remove station.
+                3  -  Return."
                 sub_menu_selection = gets.chomp.to_i
             else 
-                puts "Invalid."
+                puts "Invalid selection."
+                break
             end
             
             if sub_menu_selection == 1
                 puts "Enter the intermediate station:"
-                additional_station = gets.chomp
+                additional_station = Station.new(gets.chomp)
+                $user_stations << additional_station
                 selected_route.add_intermediate_station(additional_station)
-                puts "Intermediate station #{additional_station} has been added to the route."
+                puts "Intermediate station #{additional_station.name} has been added to the route."
             
             elsif sub_menu_selection == 2
-                puts "Enter the station to remove:"
+                puts "Enter the station name to remove:"
                 remove_station = gets.chomp
-                selected_route.remove_intermediate_station(remove_station)
-                puts "Station #{remove_station}has been removed from the route."
-
+                if $user_stations.include?(remove_station)
+                    selected_route.remove_intermediate_station(remove_station)
+                    puts "Station #{remove_station}has been removed from the route."
+                else puts "#{remove_station} station is missing in the route."
+                    station_and_route_management
+                end
+            elsif sub_menu_selection == 3
+                sub_menu_selection
             else
-                puts "Error: Invalid operate selection."
+                puts "Error: Invalid selection."
         end
 
         elsif sub_menu_selection == 4 #Return to the main menu.
           break 
 
         elsif sub_menu_selection == 5 #Exit.
-          puts "User routes: #{$user_routes_storage}"
-          puts "User routes: #{$user_stations}"
           exit
         else
           puts "Error: Invalid selection."
@@ -139,7 +143,7 @@ def create_train
     end
 end
 
-def wagon_management # Доработать
+def wagon_management 
     puts "Please select the train for wagon management:"
 
     unless $user_trains.empty?
@@ -156,15 +160,15 @@ def wagon_management # Доработать
 
             puts "Please select an option to operate:
 
-            1  -  Attach wagon
-            2  -  Detach wagon"
+            1  -  Create wagon
+            2  -  Attach wagon
+            3  -  Detach wagon"
             
             user_selection = gets.chomp.to_i
             
-            if user_selection == 1
+            if user_selection == 2
                 if selected_train.type == 'Passenger'
                     cart = Cart_passenger.new
-                    $user_carts << cart
                     selected_train.attach_cart(cart)
                 elsif selected_train.type == 'Cargo'
                     cart = Cart_cargo.new
@@ -174,12 +178,28 @@ def wagon_management # Доработать
                     wagon_management
                 end
 
-            elsif user_selection == 2
+            elsif user_selection == 3
                 cart = selected_train.carts.size - 1
                 if cart >= 0
                     selected_train.detach_cart(selected_train.carts[cart])
-                    puts "Last cart detached."
-                else puts "No carts to detach."
+                    puts "Last wagon detached."
+                    $user_carts << cart
+                else puts "No wagons to detach."
+                end
+
+            elsif user_selection == 1
+                puts "Please specify the type of wagon:
+                1  -  Passenger wagon
+                2  -  Cargo cart"
+                user_selection = gets.chomp.to_i
+                if user_selection == 1
+                    wagon = Cart_passenger.new
+                    $user_carts << wagon
+                    puts "Passenger wagon has been created."
+                elsif user_selection == 2
+                    wagon = Cart_cargo.new
+                    $user_carts << wagon
+                    puts "Cargo cart has been created."
                 end
             end
 
@@ -191,14 +211,15 @@ def wagon_management # Доработать
     end
 end
 
-def assign_route #не работает
+def assign_route 
     if $user_routes_storage.empty?
         puts "No routes available. Please create a route first (Go to the main menu -> Station & Route management - > Create route)."
     else
         puts "Please select a route from the list:"
         $user_routes_storage.each_with_index do |route, index|
-            puts "#{index + 1}  -  Route #{route.stations.join(' -> ')}"
-        end
+            station_names = route.stations.map(&:name).join(' -> ')
+            puts "#{index + 1}  -  Route #{station_names}"
+          end
         route_selection = gets.chomp.to_i
         
         if route_selection >= 1 && route_selection <= $user_routes_storage.size
@@ -219,7 +240,7 @@ def assign_route #не работает
             if train_selection >= 1 && train_selection <= $user_trains.size
                 selected_train = $user_trains[train_selection - 1]
                 selected_train.assign_route(selected_route)
-                puts "Route #{selected_route.stations.join(' -> ')} assigned for the train No.#{selected_train.number}"
+                puts "Route #{selected_route.stations.map(&:name).join(' -> ')} assigned for the train No.#{selected_train.number}"
             else
                 puts "Wrong selection."
                 assign_route
@@ -232,11 +253,32 @@ def assign_route #не работает
     end
 end
 
+def move_train
+end
+
+def show_all
+    if $user_stations.empty? && $user_trains.empty?
+        puts "No stations and trains available."
+        menu
+    else
+        $user_stations.each do |station|
+            puts "Station: #{station.name}"
+            if station.trains.empty?
+                puts "  No trains at the station."
+            else
+                puts "  Trains:"
+                station.trains.each do |train|
+                    puts "Type: #{train.type}, Number: #{train.number}"
+                end
+          end
+        end
+    end
+end
 
 loop do
     menu
     user_selection = gets.chomp.to_i
-    break if user_selection == 9
+    break if user_selection == 7
   
     if user_selection == 1
         station_and_route_management
@@ -252,5 +294,13 @@ loop do
 
     if user_selection == 4
         assign_route
+    end
+
+    if user_selection == 5
+        move_train
+    end
+
+    if user_selection == 6
+        show_all
     end
 end
