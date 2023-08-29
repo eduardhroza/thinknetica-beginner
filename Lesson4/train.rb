@@ -67,7 +67,6 @@ class Train
     current_station.arrival(self)
   end
 
-  private # Эти методы не будут вызываться из клиентского кода
   def previous_station
     @route.stations[@current_station_index - 1] if @current_station_index&.positive?
   end

@@ -14,10 +14,6 @@ $user_carts = [] #Вагоны
 
 # В моём коде вагоны (Wagons) я прописываю как "Cart/carts (вагонетки), так как вагон технически не бывает грузовым, это грузовая вагонетка."
 
-=begin
-- Перемещать поезд по маршруту вперед и назад
-=end
-
 
 def menu
     puts "Please select and action by number:
@@ -254,6 +250,40 @@ def assign_route
 end
 
 def move_train
+    if $user_trains.empty?
+        puts "No trains available."
+        menu
+
+    else puts "Please select the train to operate:"
+        $user_trains.each_with_index do |train, index|
+            puts "#{index + 1}  -  Train No.#{train.number} / type: #{train.type}"
+        end   
+        user_selection = gets.chomp.to_i
+        if user_selection >= 1 && user_selection <= $user_trains.size
+            selected_train = $user_trains[user_selection - 1]
+            puts "Selected train: #{selected_train.number}"
+
+            puts "Please select an option:
+            1  -  Move to the next station
+            2  -  Move to the previous station
+            3  - Return"
+            user_selection = gets.chomp.to_i
+
+            if user_selection == 1
+                selected_train.move_forward
+                puts "Train #{selected_train.number} has arrived to #{selected_train.current_station.name} the station."
+                move_train
+            elsif user_selection == 2
+                selected_train.move_backward
+                puts "Train #{selected_train.number} has arrived to the #{selected_train.current_station.name} station."
+                move_train
+            elsif user_selection == 3
+                move_train
+            else puts "Wrong selection."
+                move_train
+            end
+        end
+    end
 end
 
 def show_all
