@@ -126,13 +126,11 @@ def create_train
     train = Passenger_train.new(number)
     puts "Passenger train with number #{number} was created"
     $user_trains << train
-    puts "#{$user_trains}"
 
     elsif user_selection == 2
         train = Cargo_train.new(number)
         puts "Cargo train with number #{number} was created"
         $user_trains << train
-        puts "#{$user_trains}"
 
     else puts "Invalide selection"
         create_train
