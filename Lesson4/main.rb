@@ -41,11 +41,13 @@ def station_and_route_management
         if sub_menu_selection == 1 # Create route.
           puts "Please assign departure station:"
           first_station = Station.new(gets.chomp)
+          $user_stations << first_station
           puts "Please assign final station:"
           last_station = Station.new(gets.chomp)
+          $user_stations << last_station
           user_routes = Route.new(first_station, last_station)
           $user_routes_storage << user_routes
-          puts "Route #{user_routes} has been added."
+          puts "Route #{user_routes.stations.map(&:name).join(' -> ')} has been added."
 
         elsif sub_menu_selection == 2 # Create station.
           puts "Please enter the name of your station:"
@@ -250,7 +252,6 @@ end
 def move_train
     if $user_trains.empty?
         puts "No trains available."
-        menu
 
     else puts "Please select the train to operate:"
         $user_trains.each_with_index do |train, index|
@@ -270,15 +271,13 @@ def move_train
             if user_selection == 1
                 selected_train.move_forward
                 puts "Train #{selected_train.number} has arrived to #{selected_train.current_station.name} the station."
-                move_train
             elsif user_selection == 2
                 selected_train.move_backward
                 puts "Train #{selected_train.number} has arrived to the #{selected_train.current_station.name} station."
-                move_train
             elsif user_selection == 3
-                move_train
+                menu
             else puts "Wrong selection."
-                move_train
+                menu
             end
         end
     end
