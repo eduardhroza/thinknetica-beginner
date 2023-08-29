@@ -20,9 +20,9 @@ class Train
   end
 
   def attach_cart(cart)
-    if @speed.zero? && cart.cart_type == @type
+    if @speed.zero? && cart.type == @type
       @carts << cart
-      puts "#{cart.cart_type} wagon/cart has been attached to a train."
+      puts "#{cart.type} wagon/cart has been attached to a train."
     else
       puts "Wrong type of cart or train."
     end

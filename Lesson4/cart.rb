@@ -1,9 +1,7 @@
 class Cart
 
-  attr_accessor :cart_type
-
-  def initialize(cart_type)
-    @cart_type = cart_type
+  attr_accessor :type
+  def initialize(type)
+    @type = type
   end
-
 end

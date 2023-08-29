@@ -1,9 +1,7 @@
-class Cart_passenger < Cart
+class CartPassenger < Cart
   
-  attr_accessor :cart_type
-
+  attr_accessor :type
   def initialize
     super('Passenger')
   end
-
 end

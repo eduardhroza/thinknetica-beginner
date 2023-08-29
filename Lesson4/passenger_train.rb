@@ -1,4 +1,4 @@
-class Passenger_train < Train
+class PassengerTrain < Train
   
   attr_accessor :type
   def initialize(number)
