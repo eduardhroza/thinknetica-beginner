@@ -7,8 +7,6 @@ require_relative 'cart'
 require_relative 'cart_passenger'
 require_relative 'cart_cargo'
 
-# В моём коде вагоны (Wagons) я прописываю как "Cart/carts (вагонетки), так как вагон технически не бывает грузовым, это грузовая вагонетка."
-
 class Main
 
     def initialize
@@ -206,71 +204,81 @@ class Main
  # Ниже этого комментария находятся методы для меню "Wagon management".
  # Старый код упрощен и разделен на несколько маленьких методов.
 
-    def wagon_management 
+    def wagon_management
         puts "Please select the train for wagon management:"
 
         unless @trains.empty?
             @trains.each_with_index do |train, index|
-                puts "#{index + 1}  -  Train No.#{train.number} / type: #{train.type}"
+                puts "#{index + 1}  -  Train No.#{train.number} / type: #{train.type}" # Сортировка и отображение поездов
             end
-            
+
             user_selection = gets.chomp.to_i
 
             if user_selection >= 1 && user_selection <= @trains.size
-                selected_train = @trains[user_selection - 1]
+                selected_train = @trains[user_selection - 1] # Выбор поезда
 
                 puts "Selected train: #{selected_train.number}"
 
                 puts "Please select an option to operate:
-
                 1  -  Create wagon
                 2  -  Attach wagon
                 3  -  Detach wagon"
-                
-                user_selection = gets.chomp.to_i
-                
-                if user_selection == 2
-                    if selected_train.type == 'Passenger'
-                        cart = CartPassenger.new
-                        selected_train.attach_cart(cart)
-                    elsif selected_train.type == 'Cargo'
-                        cart = CartCargo.new
-                        selected_train.attach_cart(cart)
-                    else
-                        puts "Invalid train type."
-                        wagon_management
-                    end
 
-                elsif user_selection == 3 
-                    cart = selected_train.carts.size - 1
-                    if cart > 0 
-                        selected_train.detach_cart(selected_train.carts[cart])
-                        puts "Last wagon detached."
-                        @carts << cart
-                    else puts "No wagons to detach."
-                    end
-
-                elsif user_selection == 1
-                    puts "Please specify the type of wagon:
-                    1  -  Passenger wagon
-                    2  -  Cargo cart"
-                    user_selection = gets.chomp.to_i
-                    if user_selection == 1
-                        wagon = CartPassenger.new
-                        @carts << wagon
-                        puts "Passenger wagon has been created."
-                    elsif user_selection == 2
-                        wagon = CartCargo.new
-                        @carts << wagon
-                        puts "Cargo cart has been created."
-                    end
+                user_operation_selection = gets.chomp.to_i
+                case user_operation_selection
+                when 1
+                    create_wagon
+                when 2
+                    attach_wagon(selected_train)
+                when 3
+                    detach_wagon(selected_train)
+                else
+                    puts "Invalid selection."
                 end
-
             else
                 puts "Invalid selection."
             end
         else
             puts "No trains available to manage."
+        end
+    end
+
+    def create_wagon
+        puts "Please specify the type of wagon:
+        1  -  Passenger wagon
+        2  -  Cargo cart"
+        user_selection = gets.chomp.to_i
+        if user_selection == 1
+            wagon = CartPassenger.new
+            @carts << wagon
+            puts "Passenger wagon has been created."
+        elsif user_selection == 2
+            wagon = CartCargo.new
+            @carts << wagon
+            puts "Cargo cart has been created."
+        else
+            puts "Invalid selection."
+        end
+    end
+
+    def attach_wagon(train)
+        if train.type == 'Passenger'
+            cart = CartPassenger.new
+            train.attach_cart(cart)
+        elsif train.type == 'Cargo'
+            cart = CartCargo.new
+            train.attach_cart(cart)
+        else
+            puts "Invalid train type."
+        end
+    end
+
+    def detach_wagon(train)
+        cart = train.carts.last
+        if cart
+            train.detach_cart(cart)
+        else
+            puts "No wagons to detach."
         end
     end
     
