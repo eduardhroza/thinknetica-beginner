@@ -61,7 +61,10 @@ class Main
           puts "Invalid choice. Please try again."
         end
     end
-    
+
+ # Ниже этого комментария находятся методы для меню "Station & Route management".
+ # Старый код упрощен и разделен на несколько маленьких методов.
+
     def station_and_route_management
     
         loop do
@@ -71,82 +74,19 @@ class Main
             3  -  Operate routes.
             4  -  Return to the main menu.
             5  -  Exit."
-              
+          
             sub_menu_selection = gets.chomp.to_i
           
-            if sub_menu_selection == 1 # Create route.
-              puts "Please assign departure station:"
-              first_station = Station.new(gets.chomp)
-              @stations << first_station
-              puts "Please assign final station:"
-              last_station = Station.new(gets.chomp)
-              @stations << last_station
-              user_routes = Route.new(first_station, last_station)
-              @routes_storage << user_routes
-              puts "Route #{user_routes.stations.map(&:name).join(' -> ')} has been added."
-    
-            elsif sub_menu_selection == 2 # Create station.
-              puts "Please enter the name of your station:"
-              @stations << Station.new(gets.chomp)
-              puts "Station #{@stations.last.name} has been added."
-    
-            elsif sub_menu_selection == 3 # Operate routes.
-                if @routes_storage.empty?
-                    puts "No routes available"
-                    station_and_route_management
-                else
-                    puts "Please select a route:"
-                    @routes_storage.each_with_index do |route, index|
-                      station_names = route.stations.map(&:name).join(' -> ') # Чтоб на экран выводились имена станций.
-                      puts "#{index + 1} - #{station_names}"
-                    end
-                end
-    
-                route_selection = gets.chomp.to_i
-                if route_selection > 0 && route_selection <= @routes_storage.size
-                    selected_route = @routes_storage[route_selection -1]
-    
-                    puts "Selected route: #{selected_route.stations.map(&:name).join(' -> ')}"
-                
-                    puts "Please select the required action:
-                    1  -  Add station.
-                    2  -  Remove station.
-                    3  -  Return."
-                    sub_menu_selection = gets.chomp.to_i
-                else 
-                    puts "Invalid selection."
-                    break
-                end
-                
-                if sub_menu_selection == 1
-                    puts "Enter the intermediate station:"
-                    additional_station = Station.new(gets.chomp)
-                    @stations << additional_station
-                    selected_route.add_intermediate_station(additional_station)
-                    puts "Intermediate station #{additional_station.name} has been added to the route."
-                
-                elsif sub_menu_selection == 2
-                    puts "Enter the station name to remove:"
-                    remove_station = gets.chomp
-                    if @stations.any? { |station| station.name == remove_station }
-                      selected_route.remove_intermediate_station(remove_station)
-                      puts "Station #{remove_station} has been removed from the route."
-                      @stations.delete(remove_station)
-                    else
-                      puts "#{remove_station} station is missing in the route."
-                      station_and_route_management
-                    end            
-        
-                elsif sub_menu_selection == 3
-                    sub_menu_selection
-                else
-                    puts "Error: Invalid selection."
-                end
-    
-            elsif sub_menu_selection == 4 #Return to the main menu.
-              break 
-    
-            elsif sub_menu_selection == 5 #Exit.
+            case sub_menu_selection
+            when 1
+              create_route
+            when 2
+              create_station
+            when 3
+              operate_routes
+            when 4
+              start
+            when 5
               exit
             else
               puts "Error: Invalid selection."
@@ -154,7 +94,92 @@ class Main
             end
         end
     end
+
+    def create_route
+        puts "Please assign departure station:"
+        first_station = Station.new(gets.chomp)
+        @stations << first_station
+        puts "Please assign final station:"
+        last_station = Station.new(gets.chomp)
+        @stations << last_station
+        user_routes = Route.new(first_station, last_station)
+        @routes_storage << user_routes
+        puts "Route #{user_routes.stations.map(&:name).join(' -> ')} has been added."
+    end
+
+    def create_station
+        puts "Please enter the name of your station:"
+        @stations << Station.new(gets.chomp)
+        puts "Station #{@stations.last.name} has been added."
+    end
+
+    def operate_routes
+        if @routes_storage.empty?
+          puts "No routes available"
+          station_and_route_management
+        else
+          puts "Please select a route:"
+          @routes_storage.each_with_index do |route, index|
+            station_names = route.stations.map(&:name).join(' -> ')
+            puts "#{index + 1} - #{station_names}"
+          end
+
+          route_selection = gets.chomp.to_i
+
+          if route_selection > 0 && route_selection <= @routes_storage.size
+            selected_route = @routes_storage[route_selection - 1]
+            puts "Selected route: #{selected_route.stations.map(&:name).join(' -> ')}"
+            operate_route_actions(selected_route) # Вызвать метод для управления выбранным маршрутом.
+          else
+            puts "Invalid selection."
+          end
+        end
+    end
+      
+    def operate_route_actions(route) # Метод управлениями маршрутами.
+
+        puts "Please select the required action:
+        1  -  Add station.
+        2  -  Remove station.
+        3  -  Return."
+        sub_menu_selection = gets.chomp.to_i
+      
+        case sub_menu_selection
+        when 1
+          puts "Enter the intermediate station:"
+          additional_station = Station.new(gets.chomp)
+          @stations << additional_station
+          route.add_intermediate_station(additional_station)
+          puts "Intermediate station #{additional_station.name} has been added to the route."
+      
+        when 2  # Выбор для пользователя - какую станцию удалить.
+            puts "Available stations:"
+            route.stations.each_with_index do |station, index|
+                puts "#{index + 1} - #{station.name}"
+            end
+            
+            puts "Select the station to delete:"
+            station_selection = gets.chomp.to_i
+            
+            if station_selection >= 1 && station_selection <= route.stations.size
+                selected_station = route.stations[station_selection - 1]
+                route.remove_intermediate_station(selected_station.name)
+                puts "Station #{selected_station.name} has been removed."
+                @stations.delete(selected_station)
+                route.remove_intermediate_station(selected_station)
+            else
+                puts "Invalid selection."
+            end
+      
+        when 3
+          station_and_route_management
+        else
+          puts "Error: Invalid selection."
+        end
+    end
     
+ # Методы меню "Station & Route management" заканчиваются здесь. 
+
     def create_train
         puts "Please enter the train number:"
         number = gets.chomp
@@ -177,24 +202,27 @@ class Main
             create_train
         end
     end
-    
+ 
+ # Ниже этого комментария находятся методы для меню "Wagon management".
+ # Старый код упрощен и разделен на несколько маленьких методов.
+
     def wagon_management 
         puts "Please select the train for wagon management:"
-    
+
         unless @trains.empty?
             @trains.each_with_index do |train, index|
                 puts "#{index + 1}  -  Train No.#{train.number} / type: #{train.type}"
             end
             
             user_selection = gets.chomp.to_i
-    
+
             if user_selection >= 1 && user_selection <= @trains.size
                 selected_train = @trains[user_selection - 1]
-    
+
                 puts "Selected train: #{selected_train.number}"
-    
+
                 puts "Please select an option to operate:
-    
+
                 1  -  Create wagon
                 2  -  Attach wagon
                 3  -  Detach wagon"
@@ -212,16 +240,16 @@ class Main
                         puts "Invalid train type."
                         wagon_management
                     end
-    
-                elsif user_selection == 3
+
+                elsif user_selection == 3 
                     cart = selected_train.carts.size - 1
-                    if cart >= 0
+                    if cart > 0 
                         selected_train.detach_cart(selected_train.carts[cart])
                         puts "Last wagon detached."
                         @carts << cart
                     else puts "No wagons to detach."
                     end
-    
+
                 elsif user_selection == 1
                     puts "Please specify the type of wagon:
                     1  -  Passenger wagon
@@ -237,7 +265,7 @@ class Main
                         puts "Cargo cart has been created."
                     end
                 end
-    
+
             else
                 puts "Invalid selection."
             end
@@ -246,6 +274,8 @@ class Main
         end
     end
     
+ # Методы меню "Wagon management" заканчиваются здесь.
+
     def assign_route 
         if @routes_storage.empty?
             puts "No routes available. Please create a route first (Go to the main menu -> Station & Route management -> Create route)."
