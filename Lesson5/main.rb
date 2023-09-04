@@ -333,37 +333,31 @@ class Main
 
     def move_train
         return puts "No trains available." if @trains.empty?
-    
+      
         puts "Please select the train to operate:"
         display_trains
-    
         menu_selection = gets.chomp.to_i
-    
-        if menu_selection >= 1 && menu_selection <= @trains.size
-            selected_train = @trains[menu_selection - 1]
-            puts "Selected train: #{selected_train.number}"
-    
-            puts "Please select an option:
-            1  -  Move to the next station
-            2  -  Move to the previous station
-            3  - Return"
-    
-            user_selection = gets.chomp.to_i
-    
-            case user_selection
-            when 1
-                selected_train.move_forward
-                puts "Train #{selected_train.number} has arrived at #{selected_train.current_station.name} station."
-            when 2
-                selected_train.move_backward
-                puts "Train #{selected_train.number} has arrived at #{selected_train.current_station.name} station."
-            when 3
-                show_menu
-            else
-                puts "Wrong selection."
-                show_menu
-            end
+        return unless (1..@trains.size).include?(menu_selection)
+        selected_train = @trains[menu_selection - 1]
+        puts "Selected train: #{selected_train.number}"
+      
+        puts "Please select an option:
+        1  -  Move to the next station
+        2  -  Move to the previous station
+        3  - Return"
+      
+        user_selection = gets.chomp.to_i
+        case user_selection
+        when 1
+          selected_train.move_forward
+        when 2
+          selected_train.move_backward
+        when 3
+          show_menu
+        else
+          puts "Wrong selection."
         end
+        puts "Train #{selected_train.number} has arrived at #{selected_train.current_station.name} station."
     end
     
     def show_all
