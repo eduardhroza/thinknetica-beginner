@@ -1,13 +1,5 @@
 module Manufacturer
   attr_accessor :manufacturer
-
-  def set_manufacturer(name)
-    self.manufacturer = name
-  end
-
-  def get_manufacturer
-    manufacturer
-  end
 end
 
 module InstanceCounter
