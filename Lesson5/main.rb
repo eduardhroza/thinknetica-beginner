@@ -62,7 +62,6 @@ class Main
     end
 
  # Ниже этого комментария находятся методы для меню "Station & Route management".
- # Старый код упрощен и разделен на несколько маленьких методов.
 
     def station_and_route_management
     
@@ -203,7 +202,6 @@ class Main
     end
  
  # Ниже этого комментария находятся методы для меню "Wagon management".
- # Старый код упрощен и разделен на несколько маленьких методов.
 
     def wagon_management
         puts "Please select the train for wagon management:"
