@@ -263,10 +263,10 @@ class Main
     end
 
     def attach_wagon(train)
-        if train.type == 'Passenger'
+        if train.type == :passenger
             cart = CartPassenger.new
             train.attach_cart(cart)
-        elsif train.type == 'Cargo'
+        elsif train.type == :cargo
             cart = CartCargo.new
             train.attach_cart(cart)
         else
@@ -299,7 +299,7 @@ class Main
             if route_selection >= 1 && route_selection <= @routes_storage.size
                 selected_route = @routes_storage[route_selection - 1]
     
-                puts "Please assign a train for the route #{selected_route}."
+                puts "Please assign a train for the route #{selected_route.stations.map(&:name).join(' -> ')}."
                 if @trains.empty?
                     puts "No trains available."
                     show_menu

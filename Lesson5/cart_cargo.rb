@@ -1,6 +1,6 @@
 class CartCargo < Cart
   def initialize
-    @type = 'Cargo'
+    @type = :cargo
     super
   end
 end
