@@ -105,9 +105,17 @@ class Main
   end
 
   def create_station
-    puts "Please enter the name of your station:"
-    @stations << Station.new(gets.chomp)
-    puts "Station #{@stations.last.name} has been added."
+    begin
+      puts "Please enter the name of your station:"
+      @stations << Station.new(gets.chomp)
+      puts "Station #{@stations.last.name} has been added."
+      rescue StandardError
+        puts "Wrong station name, please try again:"
+        retry
+      rescue => e
+        puts "#{e.message}"
+        retry
+    end
   end
 
   def operate_routes

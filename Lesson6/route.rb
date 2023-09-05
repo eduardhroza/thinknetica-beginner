@@ -11,15 +11,10 @@ class Route
   end
 
   def validate!
-    raise "Name can't be empty." if [first_station, last_station].any?(&:nil? || :empty?)
-    raise "Invalid format." unless first_station =~ NUMBER_FORMAT && last_station =~ NUMBER_FORMAT
-  end
-
-  def valid?
-    validate!
-    true
-  rescue
-    false
+    errors = []
+    errors << "Name can't be empty." if [first_station, last_station].any?(&:nil? || :empty?)
+    errors << "Invalid format." unless first_station =~ NUMBER_FORMAT && last_station =~ NUMBER_FORMAT
+    raise errors.join(".") unless errors.empty?
   end
 
   def add_intermediate_station(station)

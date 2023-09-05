@@ -17,15 +17,10 @@ class Station
   end
 
   def validate!
-    raise "Name can't be empty." if name.nil? || name == ""
-    raise "Invalid format." unless name =~ NUMBER_FORMAT
-  end
-
-  def valid?
-    validate!
-    true
-  rescue
-    false
+    errors = []
+    errors <<  "Name can't be empty." if name.nil? || name == ""
+    errors <<  "Invalid format." unless name =~ NUMBER_FORMAT
+    raise errors.join(".") unless errors.empty?
   end
 
   def self.all

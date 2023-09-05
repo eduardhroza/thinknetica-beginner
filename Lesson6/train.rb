@@ -19,9 +19,11 @@ class Train
   end
 
   def validate!
-    raise "Number can't be empty." if @number.nil? || number == ""
-    raise "Invalid format." unless @number =~ NUMBER_FORMAT
-    raise "Type may be only passenger or cargo." unless @type == :cargo || @type == :passenger
+    errors = []
+    errors << "Number can't be empty." if @number.nil? || number == ""
+    errors << "Invalid format." unless @number =~ NUMBER_FORMAT
+    errors << "Type may be only passenger or cargo." unless @type == :cargo || @type == :passenger
+    raise errors.join(".") unless errors.empty?
   end
 
   def self.find(train_number)
