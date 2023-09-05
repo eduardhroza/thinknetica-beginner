@@ -47,7 +47,7 @@ class Train
 
   def detach_cart(cart)
     @carts.delete(cart) if @speed.zero? && @carts.include?(cart)
-    puts "#{cart.type.to_s.capitalize} has been detached from a train."
+    puts "#{cart.type.to_s.capitalize} wagon/cart has been detached from a train."
   end
 
   def assign_route(route)
