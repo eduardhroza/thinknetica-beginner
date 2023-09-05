@@ -179,25 +179,23 @@ class Main
  # Методы меню "Station & Route management" заканчиваются здесь. 
 
     def create_train
-        puts "Please enter the train number:"
-        number = gets.chomp
-        puts "Please select the type of train:
-        1  -  Passenger train
-        2  -  Cargo train"
-        user_selection = gets.chomp.to_i
-    
-        if user_selection == 1
-        train = PassengerTrain.new(number)
-        puts "Passenger train with number #{number} was created"
-        @trains << train
-    
-        elsif user_selection == 2
-            train = CargoTrain.new(number)
-            puts "Cargo train with number #{number} was created"
+        begin
+            puts "Please enter the train number:"
+            number = gets.chomp
+            puts "Please select the type of train:
+            1  -  Passenger train
+            2  -  Cargo train"
+            user_selection = gets.chomp.to_i
+            train = PassengerTrain.new(number) if user_selection == 1
+            train = CargoTrain.new(number) if user_selection == 2
+            puts "#{train.type.to_s.capitalize} train with number #{number} was created"
             @trains << train
-    
-        else puts "Invalide selection"
-            create_train
+        rescue StandardError
+            puts "Wrong train number, please try again:"
+            retry
+          rescue => e
+            puts "#{e.message}"
+            retry
         end
     end
  
@@ -247,29 +245,16 @@ class Main
         1  -  Passenger wagon
         2  -  Cargo cart"
         user_selection = gets.chomp.to_i
-        if user_selection == 1
-            wagon = CartPassenger.new
-            @carts << wagon
-            puts "Passenger wagon has been created."
-        elsif user_selection == 2
-            wagon = CartCargo.new
-            @carts << wagon
-            puts "Cargo cart has been created."
-        else
-            puts "Invalid selection."
-        end
+        wagon = CartPassenger.new if user_selection == 1
+        wagon = CartCargo.new if user_selection == 2
+        @carts << wagon
+        puts "#{wagon.type.to_s.capitalize} cart has been created."
     end
 
     def attach_wagon(train)
-        if train.type == :passenger
-            cart = CartPassenger.new
-            train.attach_cart(cart)
-        elsif train.type == :cargo
-            cart = CartCargo.new
-            train.attach_cart(cart)
-        else
-            puts "Invalid train type."
-        end
+        cart = CartPassenger.new if train.type == :passenger
+        cart = CartCargo.new if train.type == :cargo
+        train.attach_cart(cart)
     end
 
     def detach_wagon(train)

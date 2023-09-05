@@ -5,13 +5,27 @@ class Station
   attr_reader :name, :stations
   attr_accessor :trains
   include InstanceCounter
+  NUMBER_FORMAT = /^[a-zA-Z0-9]{1,58}$/
 
   @@stations = []
 
   def initialize(name) 
-    @name = name 
+    @name = name.to_s
+    validate!
     @trains = []
     self.class.all << self
+  end
+
+  def validate!
+    raise "Name can't be empty." if name.nil? || name == ""
+    raise "Invalid format." unless name =~ NUMBER_FORMAT
+  end
+
+  def valid?
+    validate!
+    true
+  rescue
+    false
   end
 
   def self.all
@@ -48,7 +62,6 @@ class Station
     train = @trains.find { |train| train.number == train_number }
     if train
       @trains.delete(train)
-      puts "Sent a #{train.type} train with number #{train.number}"
     else
       puts "Train with number #{train_number} not found at the station."
     end

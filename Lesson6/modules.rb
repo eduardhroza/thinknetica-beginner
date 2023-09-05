@@ -23,4 +23,14 @@ module InstanceCounter
       self.class.instances += 1
     end
   end
+
+  module Validity
+    def valid?
+      validate!
+      true
+    rescue
+      false
+    end
+  end
+
 end

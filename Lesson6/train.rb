@@ -7,7 +7,7 @@ class Train
   include InstanceCounter
   NUMBER_FORMAT = /^[A-Za-z0-9]{3}-?[A-Za-z0-9]{2}$/
 
-  def initialize(number, type)
+  def initialize(number)
     @number = number.to_s
     @type = type
     validate!
@@ -17,13 +17,13 @@ class Train
     @route = nil
     register_instance
   end
-##################################################
+
   def validate!
-    raise "Number can't be empty." if number.nil?
-    raise "Invalid format." unless number =~ NUMBER_FORMAT
-    raise "Type may be only passenger or cargo." unless type == :cargo || type == :passenger
+    raise "Number can't be empty." if @number.nil? || number == ""
+    raise "Invalid format." unless @number =~ NUMBER_FORMAT
+    raise "Type may be only passenger or cargo." unless @type == :cargo || @type == :passenger
   end
-#####################################################
+
   def self.find(train_number)
     trains_find.find {|train| train.number == train_number}
   end
@@ -41,29 +41,13 @@ class Train
   end
 
   def attach_cart(cart)
-    if @speed.zero? && cart.type == @type
-      @carts << cart
-      puts "#{cart.type} wagon/cart has been attached to a train."
-    else
-      puts "Wrong type of cart or train."
-    end
-    if @speed > 0
-      puts "Unable to detach while underway."
-    end
+    @carts << cart if @speed.zero? && cart.type == @type
+    puts "#{cart.type.to_s.capitalize} wagon/cart has been attached to a train."
   end
 
   def detach_cart(cart)
-    if @speed.zero? && @carts.include?(cart)
-      @carts.delete(cart)
-      puts "#{cart} has been detached from a train."
-    elsif @carts.empty?
-      puts "There are no carts on this train."
-    else
-      puts 'Wrong type of cart or train.'
-    end
-    if @speed > 0
-      puts "Unable to detach while underway."
-    end
+    @carts.delete(cart) if @speed.zero? && @carts.include?(cart)
+    puts "#{cart.type.to_s.capitalize} has been detached from a train."
   end
 
   def assign_route(route)
@@ -74,7 +58,6 @@ class Train
 
   def move_forward
     return unless next_station
-
     current_station.departure(self)
     @current_station_index += 1
     current_station.arrival(self)
@@ -82,7 +65,6 @@ class Train
 
   def move_backward
     return unless previous_station
-
     current_station.departure(self)
     @current_station_index -= 1
     current_station.arrival(self)
