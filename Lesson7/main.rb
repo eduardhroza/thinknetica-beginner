@@ -249,14 +249,16 @@ class Main
       case user_selection
       when 1
         puts "Please set the quantity of seats:"
-        num = gets.chomp.to_i
-        wagon = CartPassenger.new(num)
-        puts "Passenger wagon (seats: #{num}) has been created."
+        seats = gets.chomp.to_i
+        wagon = CartPassenger.new(seats)
+        wagon.validate!
+        puts "Passenger wagon (seats: #{seats}) has been created."
       when 2
         puts "Please set the volume of the cart:"
-        vol = gets.chomp.to_i
-        wagon = CartCargo.new(vol)
-        puts "Cargo cart (volume: #{vol}) has been created."
+        total_volume = gets.chomp.to_i
+        wagon = CartCargo.new(total_volume)
+        wagon.validate!
+        puts "Cargo cart (volume: #{total_volume}) has been created."
       else
         puts "Invalid selection. Please choose 1 for passenger or 2 for cargo."
         return
