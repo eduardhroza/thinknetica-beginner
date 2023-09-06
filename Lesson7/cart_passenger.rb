@@ -1,7 +1,7 @@
 class CartPassenger < Cart
   def initialize(seats)
     @type = :passenger
-    super(seats)
+    super
   end
 
   def take_seat

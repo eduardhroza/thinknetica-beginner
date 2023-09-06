@@ -240,7 +240,6 @@ class Main
     end
   end
 
-
   def create_wagon
     begin
       puts "Please specify the type of wagon:
@@ -283,7 +282,7 @@ class Main
         if selected_cart.type == train.type
           train.attach_cart(selected_cart)
         else
-          puts "Unable to attach to the wrong type of train."
+          puts "Impossible to join to another type of train."
         end
       else
         puts "Invalid cart selection."
