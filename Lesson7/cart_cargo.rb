@@ -11,12 +11,13 @@ class CartCargo < Cart
     super()
   end
 
-  def bulk(volume) # Занять объем
-    if (@occupied_volume + volume) > @total_volume
-      puts "Volume exceeds available space"
+  def bulk(volume) # Load the cart.
+    volume = volume.to_i 
+    if (occupied_volume + volume) > @total_volume.to_i
+      puts "Volume exceeds available space."
     else
-    @occupied_volume += volume
-    @total_volume -= volume
+      @occupied_volume += volume
+      @total_volume = (@total_volume.to_i - volume)
     end
   end
   
