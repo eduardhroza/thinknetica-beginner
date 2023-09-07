@@ -20,7 +20,12 @@ class CartPassenger < Cart
   end
 
   def take_seat
-    @used_seats += 1
+    if free_seats == 0
+      puts "There are no free seats available."
+    else
+      @used_seats += 1
+      @seats.to_i - @used_seats
+    end
   end
 
   def validate!

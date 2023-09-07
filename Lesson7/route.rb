@@ -1,4 +1,3 @@
-# Класс Route (Маршрут):
 require_relative 'modules'
 
 class Route

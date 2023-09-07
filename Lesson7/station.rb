@@ -1,4 +1,3 @@
-# Класс Station (Станция):
 require_relative 'modules'
 
 class Station
