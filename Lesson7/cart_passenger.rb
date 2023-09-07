@@ -24,7 +24,7 @@ class CartPassenger < Cart
       puts "There are no free seats available."
     else
       @used_seats += 1
-      @seats.to_i - @used_seats
+      @seats = (@seats.to_i - 1)
     end
   end
 
