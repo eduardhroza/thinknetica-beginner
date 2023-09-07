@@ -83,4 +83,16 @@ class Train
   def next_station
     @route.stations[@current_station_index + 1] if @current_station_index&.between?(0, @route.stations.size - 2)
   end
+
+  def iterate_through_carts(&block) # Iterate through carts in trains, Passing each cart to a block.
+    @carts.each do |cart|
+      block.call(cart)
+      if cart.type == :passenger
+        puts "Used seats: #{cart.used_seats}, Free seats: #{cart.free_seats}"
+      else
+        puts "Free volume: #{cart.free_volume}, Occupied volume: #{cart.occupied_volume}"
+      end
+    end
+  end
+
 end

@@ -6,6 +6,8 @@ class CartCargo < Cart
     @type = :cargo
     @total_volume = total_volume.to_s
     @occupied_volume = 0
+    @@current_number += 1
+    @number += @@current_number
     super()
   end
 
@@ -18,12 +20,12 @@ class CartCargo < Cart
     end
   end
   
-  def show_occupied_volume
+  def occupied_volume
     @occupied_volume
   end
 
-  def show_free_volume
-    @total_volume - occupied_volume
+  def free_volume
+    @total_volume.to_i - occupied_volume.to_i
   end
 
   def validate!

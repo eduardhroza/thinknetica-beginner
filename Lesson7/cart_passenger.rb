@@ -1,11 +1,13 @@
 class CartPassenger < Cart
 
   NUMBER_FORMAT = /\A([1-9]|1\d|25)\z/
-  
+
   def initialize(seats)
     @type = :passenger
     @seats = seats.to_s
     @used_seats = 0
+    @@current_number += 1
+    @number = @@current_number
     super()
   end
 

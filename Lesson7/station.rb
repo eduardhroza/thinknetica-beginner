@@ -38,7 +38,7 @@ class Station
     else
       puts "Trains at #{@name} station:"
       @trains.each do |train|
-        puts "Train type: #{train.type}, Number: #{train.number}"
+        puts "Train type: #{train.type}, Number: #{train.number}, Wagons: #{train.carts}"
       end
     end
   end
@@ -69,4 +69,12 @@ class Station
   def departure(train)
     @trains.delete(train)
   end
+
+  def iterate_through_trains(&block) # Iterate through trains on station, passing each train to a block.
+    @trains.each do |train|
+      block.call(train)
+      puts "Train number: #{train.number}, Train type: #{train.type}, Wagons: #{train.carts.length}"
+    end
+  end
+
 end

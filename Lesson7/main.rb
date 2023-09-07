@@ -11,10 +11,10 @@ require_relative 'modules'
 class Main
 
   def initialize
-    @trains = [] #Поезда
-    @routes_storage = [] #Маршруты
-    @stations = [] #Станции
-    @carts = [] #Вагоны
+    @trains = [] # Trains
+    @routes_storage = [] # Routes
+    @stations = [] # Stations
+    @carts = [] # Wagons
   end
 
   def start
@@ -29,7 +29,7 @@ class Main
     puts "Please select an action by number:"
     puts "1  -  Station & Route management."
     puts "2  -  Create a train."
-    puts "3  -  Wagons management."
+    puts "3  -  Train wagon management."
     puts "4  -  Assign route for a train."
     puts "5  -  Move train."
     puts "6  -  Show all stations and list of trains on the stations."
@@ -224,7 +224,8 @@ class Main
         puts "Please select an option to operate:
         1  -  Create wagon
         2  -  Attach wagon
-        3  -  Detach wagon"
+        3  -  Detach wagon
+        4  -  Display wagons"
 
         user_operation_selection = gets.chomp.to_i
         case user_operation_selection
@@ -234,6 +235,8 @@ class Main
             attach_wagon(selected_train)
         when 3
             detach_wagon(selected_train)
+        when 4
+            inspect_train_wagons(selected_train)
         else
             wagon_management
         end
@@ -311,6 +314,15 @@ class Main
       end
     end
   end
+
+  def inspect_train_wagons(selected_train) # Output the list of carts in the train.
+    if selected_train.carts.empty?
+      puts "No wagons/carts attached to this train."
+    else      
+      selected_train.iterate_through_carts do |cart|
+      end
+    end
+  end
   
 # Методы меню "Wagon management" заканчиваются здесь.
 
@@ -385,27 +397,55 @@ class Main
     puts "Train #{selected_train.number} has arrived at #{selected_train.current_station.name} station."
   end
   
-  def show_all
+  def show_all # Added new features
     if @stations.empty? && @trains.empty?
-        puts "No stations and trains available."
-        show_menu
+      puts "No stations and trains available."
+      show_menu
     elsif @stations.empty? && !@trains.empty?
-        puts "No stations available, trains are at the depot."
+      puts "No stations available, trains are at the depot."
     else
-        @stations.each do |station|
-            puts "Station: #{station.name}"
-            if station.trains.empty?
-                puts "  No trains at the station."
-            else
-                puts "  Trains:"
-                station.trains.each do |train|
-                    puts "Type: #{train.type}, Number: #{train.number}"
-                end
+      @stations.each do |station|
+        puts "Station: #{station.name}"
+        if station.trains.empty?
+          puts "No trains at the station."
+        else
+          puts "Trains:"
+          station.iterate_through_trains do |train| # New method
+            train.iterate_through_carts do |cart| # New method
+            end
           end
         end
+      end
     end
   end
 
 end
 
 Main.new.start
+
+
+# ТЗ
+# Wagon management переделан
+
+=begin
+train = CargoTrain.new(24412)
+cp = CartCargo.new(77)
+cp2 = CartCargo.new(88)
+train.attach_cart(cp)
+train.attach_cart(cp2)
+train.iterate_through_carts do |cart|
+end
+
+train2 = PassengerTrain.new(34412)
+cp = CartPassenger.new(11)
+cp2 = CartPassenger.new(12)
+train2.attach_cart(cp)
+train2.attach_cart(cp2)
+train2.iterate_through_carts do |cart|
+end
+
+st1 = Station.new('1')
+st1.add_train(train)
+st1.iterate_through_trains do |train|
+end
+=end
