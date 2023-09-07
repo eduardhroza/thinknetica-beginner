@@ -421,16 +421,18 @@ class Main
 
 end
 
-Main.new.start
+#Main.new.start
 
 
-# ТЗ
-# Wagon management переделан
+# ТЗ переделано, внизу добавлены новые методы дял проверки, все работает. validate! тоже перенес в класс cart родительский
 
-=begin
-train = CargoTrain.new(24412)
-cp = CartCargo.new(77)
+
+train = CargoTrain.new(12345)
+cp = CartCargo.new(66)
+cp.validate!
 cp2 = CartCargo.new(88)
+cp2.validate!
+cp2.fill_volume(55)
 train.attach_cart(cp)
 train.attach_cart(cp2)
 train.iterate_through_carts do |cart|
@@ -438,7 +440,10 @@ end
 
 train2 = PassengerTrain.new(34412)
 cp = CartPassenger.new(11)
-cp2 = CartPassenger.new(12)
+cp2 = CartPassenger.new(22)
+cp2.validate!
+cp2.take_place
+cp2.take_place
 train2.attach_cart(cp)
 train2.attach_cart(cp2)
 train2.iterate_through_carts do |cart|
@@ -448,4 +453,3 @@ st1 = Station.new('1')
 st1.add_train(train)
 st1.iterate_through_trains do |train|
 end
-=end

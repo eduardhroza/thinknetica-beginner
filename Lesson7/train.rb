@@ -88,9 +88,9 @@ class Train
     @carts.each do |cart|
       block.call(cart)
       if cart.type == :passenger
-        puts "Used seats: #{cart.used_seats}, Free seats: #{cart.free_seats}"
+        puts "Used seats: #{cart.used_place}, Free seats: #{cart.free_place}"
       else
-        puts "Free volume: #{cart.free_volume}, Occupied volume: #{cart.occupied_volume}"
+        puts "Free volume: #{cart.free_place}, Occupied volume: #{cart.used_place}"
       end
     end
   end
