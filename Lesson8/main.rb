@@ -108,9 +108,6 @@ class Main
     puts 'Please enter the name of your station:'
     @stations << Station.new(gets.chomp)
     puts "Station #{@stations.last.name} has been added."
-  rescue StandardError
-    puts 'Wrong station name, please try again:'
-    retry
   rescue StandardError => e
     puts e.message
     retry
@@ -416,4 +413,4 @@ class Main
   end
 end
 
-# Main.new.start
+Main.new.start

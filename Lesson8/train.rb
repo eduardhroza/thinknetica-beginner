@@ -3,7 +3,7 @@
 require_relative 'modules'
 
 class Train
-  attr_reader :number, :speed, :carts, :trains, :carts
+  attr_reader :number, :speed, :carts, :trains
   attr_accessor :type
 
   include Manufacturer
