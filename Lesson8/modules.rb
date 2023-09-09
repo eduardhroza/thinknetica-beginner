@@ -1,3 +1,4 @@
+# rubocop:disable Lint/DuplicateMethods
 # frozen_string_literal: true
 
 module Manufacturer
@@ -35,3 +36,5 @@ module InstanceCounter
     end
   end
 end
+
+# rubocop:enable Lint/DuplicateMethods

@@ -126,7 +126,6 @@ class Main
     route.remove_intermediate_station(selected_station.name)
     puts "Station #{selected_station.name} has been removed."
     @stations.delete(selected_station)
-    route.remove_intermediate_station(selected_station)
   end
 
   def operate_route_actions
@@ -194,8 +193,6 @@ class Main
       detach_wagon(selected_train)
     when 4
       inspect_train_wagons(selected_train)
-    else
-      return
     end
   end
 
@@ -205,16 +202,12 @@ class Main
     case user_selection
     when 1
       puts 'Please set the quantity of seats:'
-      seats = user_choice.to_i
-      wagon = CartPassenger.new(seats)
-      wagon.validate!
-      puts "Passenger wagon (seats: #{seats}) has been created."
+      wagon = CartPassenger.new(user_choice.to_i).tap(&:validate!)
+      puts "Passenger wagon (seats: #{wagon.total_place}) has been created."
     when 2
       puts 'Please set the volume of the cart:'
-      total_volume = user_choice.to_i
-      wagon = CartCargo.new(total_volume)
-      wagon.validate!
-      puts "Cargo cart (volume: #{total_volume}) has been created."
+      wagon = CartCargo.new(user_choice.to_i).tap(&:validate!)
+      puts "Cargo cart (volume: #{wagon.total_place}) has been created."
     else
       puts 'Invalid selection. Please choose 1 for passenger or 2 for cargo.'
       return
@@ -226,24 +219,21 @@ class Main
   end
 
   def attach_wagon(train)
-    if @carts.empty?
-      puts 'No free wagons/carts available.'
-    else
-      puts 'Please select the wagon/cart:'
-      @carts.each_with_index do |cart, index|
-        puts "#{index + 1}. #{cart.inspect}"
-      end
-      cart_index = user_choice.to_i - 1
-      if cart_index.between?(0, @carts.length - 1)
-        selected_cart = @carts.delete_at(cart_index)
-        if selected_cart.type == train.type
-          train.attach_cart(selected_cart)
-        else
-          puts 'Impossible to join to another type of train.'
-        end
+    puts 'No free wagons/carts available.' if @carts.empty?
+    puts 'Please select the wagon/cart:'
+    @carts.each_with_index do |cart, index|
+      puts "#{index + 1}. #{cart.inspect}"
+    end
+    cart_index = user_choice.to_i - 1
+    if cart_index.between?(0, @carts.length - 1)
+      selected_cart = @carts.delete_at(cart_index)
+      if selected_cart.type == train.type
+        train.attach_cart(selected_cart)
       else
-        puts 'Invalid cart selection.'
+        puts 'Impossible to join to another type of train.'
       end
+    else
+      puts 'Invalid cart selection.'
     end
   end
 
