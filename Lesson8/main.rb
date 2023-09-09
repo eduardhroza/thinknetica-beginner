@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'menu'
 require_relative 'route'
 require_relative 'station'
 require_relative 'train'
@@ -16,28 +17,18 @@ class Main
     @routes_storage = [] # Routes
     @stations = [] # Stations
     @carts = [] # Wagons
+    @menu = Menu.new
   end
 
   def start
     loop do
-      show_menu
-      choice = get_user_choice
+      @menu.show_menu
+      choice = user_choice
       action(choice)
     end
   end
 
-  def show_menu
-    puts 'Please select an action by number:'
-    puts '1  -  Station & Route management.'
-    puts '2  -  Create a train.'
-    puts '3  -  Train wagon management.'
-    puts '4  -  Assign route for a train.'
-    puts '5  -  Move train.'
-    puts '6  -  Show all stations and list of trains on the stations.'
-    puts '7  -  Exit.'
-  end
-
-  def get_user_choice
+  def user_choice
     gets.chomp
   end
 
@@ -66,14 +57,8 @@ class Main
 
   def station_and_route_management
     loop do
-      puts "Please select an action by number:
-        1  -  Create route.
-        2  -  Create station.
-        3  -  Operate routes.
-        4  -  Return to the main menu.
-        5  -  Exit."
-
-      sub_menu_selection = gets.chomp.to_i
+      @menu.route_menu
+      sub_menu_selection = user_choice.to_i
 
       case sub_menu_selection
       when 1
@@ -84,8 +69,6 @@ class Main
         operate_routes
       when 4
         start
-      when 5
-        exit
       else
         exit
       end
@@ -94,19 +77,16 @@ class Main
 
   def create_route
     puts 'Please assign departure station:'
-    first_station = Station.new(gets.chomp)
-    @stations << first_station
+    @stations << (first_station = Station.new(user_choice))
     puts 'Please assign final station:'
-    last_station = Station.new(gets.chomp)
-    @stations << last_station
-    user_routes = Route.new(first_station, last_station)
-    @routes_storage << user_routes
-    puts "Route #{user_routes.stations.map(&:name).join(' -> ')} has been added."
+    @stations << (last_station = Station.new(user_choice))
+    @routes_storage << (user_routes = Route.new(first_station, last_station))
+    puts "Route #{user_routes.stations.map(&:name).join(' -> ')} has been created."
   end
 
   def create_station
     puts 'Please enter the name of your station:'
-    @stations << Station.new(gets.chomp)
+    @stations << Station.new(user_choice)
     puts "Station #{@stations.last.name} has been added."
   rescue StandardError => e
     puts e.message
@@ -114,57 +94,51 @@ class Main
   end
 
   def operate_routes
-    if @routes_storage.empty?
-      puts 'No routes available'
-      station_and_route_management
-    else
-      puts 'Please select a route:'
-      @routes_storage.each_with_index do |route, index|
-        station_names = route.stations.map(&:name).join(' -> ')
-        puts "#{index + 1} - #{station_names}"
-      end
+    return puts 'No routes available' if @routes_storage.empty?
 
-      route_selection = gets.chomp.to_i
+    puts 'Please select a route:'
+    display_routes
+    route_selection = user_choice.to_i
+    return unless route_selection.positive? && route_selection <= @routes_storage.size
 
-      if route_selection.positive? && route_selection <= @routes_storage.size
-        selected_route = @routes_storage[route_selection - 1]
-        puts "Selected route: #{selected_route.stations.map(&:name).join(' -> ')}"
-        operate_route_actions(selected_route)
-      else
-        operate_routes
-      end
+    selected_route = @routes_storage[route_selection - 1]
+    puts "Selected route: #{selected_route.stations.map(&:name).join(' -> ')}"
+    operate_route_actions(selected_route)
+  end
+
+  def add_station
+    puts 'Enter the intermediate station:'
+    @stations << (additional_station = Station.new(user_choice))
+    route.add_intermediate_station(additional_station)
+    puts "Intermediate station #{additional_station.name} has been added to the route."
+  end
+
+  def delete_station
+    puts 'Select the station to delete:'
+    route.stations.each_with_index do |station, index|
+      puts "#{index + 1} - #{station.name}"
     end
+    station_selection = user_choice.to_i
+
+    return unless station_selection >= 1 && station_selection <= route.stations.size
+
+    selected_station = route.stations[station_selection - 1]
+    route.remove_intermediate_station(selected_station.name)
+    puts "Station #{selected_station.name} has been removed."
+    @stations.delete(selected_station)
+    route.remove_intermediate_station(selected_station)
   end
 
   def operate_route_actions(route)
-    puts "Please select the required action:
-    1  -  Add station.
-    2  -  Remove station.
-    3  -  Return."
-    sub_menu_selection = gets.chomp.to_i
+    @menu.operate_route_menu
+    sub_menu_selection = user_choice.to_i
 
     case sub_menu_selection
     when 1
-      puts 'Enter the intermediate station:'
-      additional_station = Station.new(gets.chomp)
-      @stations << additional_station
-      route.add_intermediate_station(additional_station)
-      puts "Intermediate station #{additional_station.name} has been added to the route."
+      add_station
 
     when 2
-      puts 'Select the station to delete:'
-      route.stations.each_with_index do |station, index|
-        puts "#{index + 1} - #{station.name}"
-      end
-      station_selection = gets.chomp.to_i
-
-      return unless station_selection >= 1 && station_selection <= route.stations.size
-
-      selected_station = route.stations[station_selection - 1]
-      route.remove_intermediate_station(selected_station.name)
-      puts "Station #{selected_station.name} has been removed."
-      @stations.delete(selected_station)
-      route.remove_intermediate_station(selected_station)
+      delete_station
 
     when 3
       station_and_route_management
@@ -177,11 +151,9 @@ class Main
 
   def create_train
     puts 'Please enter the train number:'
-    number = gets.chomp
-    puts "Please select the type of train:
-        1  -  Passenger train
-        2  -  Cargo train"
-    user_selection = gets.chomp.to_i
+    number = user_choice
+    @menu.create_train_menu
+    user_selection = user_choice.to_i
     return if user_selection != 1 && user_selection != 2
 
     train = PassengerTrain.new(number) if user_selection == 1
@@ -199,27 +171,20 @@ class Main
   # Ниже этого комментария находятся методы для меню "Wagon management".
 
   def wagon_management
-    if @trains.empty?
-      puts 'No trains available to manage.'
-      return
-    end
+    return puts 'No trains available to manage.' if @trains.empty?
 
+    @menu.show_menu
     puts 'Please select the train for wagon management:'
     display_trains
-    user_selection = gets.chomp.to_i
+    user_selection = user_choice.to_i
     return unless user_selection >= 1 && user_selection <= @trains.size
 
     selected_train = @trains[user_selection - 1]
 
     puts "Selected train: #{selected_train.number}"
+    @menu.wagon_menu
 
-    puts "Please select an option to operate:
-        1  -  Create wagon
-        2  -  Attach wagon
-        3  -  Detach wagon
-        4  -  Display wagons"
-
-    user_operation_selection = gets.chomp.to_i
+    user_operation_selection = user_choice.to_i
     case user_operation_selection
     when 1
       create_wagon
@@ -230,25 +195,23 @@ class Main
     when 4
       inspect_train_wagons(selected_train)
     else
-      wagon_management
+      return
     end
   end
 
   def create_wagon
-    puts "Please specify the type of wagon:
-      1  -  Passenger wagon
-      2  -  Cargo cart"
-    user_selection = gets.chomp.to_i
+    @menu.create_wagon_menu
+    user_selection = user_choice.to_i
     case user_selection
     when 1
       puts 'Please set the quantity of seats:'
-      seats = gets.chomp.to_i
+      seats = user_choice.to_i
       wagon = CartPassenger.new(seats)
       wagon.validate!
       puts "Passenger wagon (seats: #{seats}) has been created."
     when 2
       puts 'Please set the volume of the cart:'
-      total_volume = gets.chomp.to_i
+      total_volume = user_choice.to_i
       wagon = CartCargo.new(total_volume)
       wagon.validate!
       puts "Cargo cart (volume: #{total_volume}) has been created."
@@ -270,7 +233,7 @@ class Main
       @carts.each_with_index do |cart, index|
         puts "#{index + 1}. #{cart.inspect}"
       end
-      cart_index = gets.chomp.to_i - 1
+      cart_index = user_choice.to_i - 1
       if cart_index.between?(0, @carts.length - 1)
         selected_cart = @carts.delete_at(cart_index)
         if selected_cart.type == train.type
@@ -293,7 +256,7 @@ class Main
         puts "#{cart_num + 1} - #{cart.inspect}"
       end
       puts 'Please select a wagon to detach:'
-      cart_index = gets.chomp.to_i - 1
+      cart_index = user_choice.to_i - 1
       if cart_index.between?(0, train.carts.length - 1)
         selected_cart = train.carts[cart_index]
         @carts << selected_cart
@@ -320,30 +283,23 @@ class Main
     return puts 'No routes available. Please create a route first.' if @routes_storage.empty?
 
     puts 'Please select a route from the list:'
-    @routes_storage.each_with_index do |route, index|
-      station_names = route.stations.map(&:name).join(' -> ')
-      puts "#{index + 1}  -  Route #{station_names}"
-    end
-    route_selection = gets.chomp.to_i
+    display_routes
+    route_selection = user_choice.to_i
 
     if route_selection >= 1 && route_selection <= @routes_storage.size
       selected_route = @routes_storage[route_selection - 1]
 
-      puts "Please assign a train for the route #{selected_route.stations.map(&:name).join(' -> ')}."
-      if @trains.empty?
-        puts 'No trains available.'
-        show_menu
-        return
-      end
+      return puts 'No trains available.' if @trains.empty?
 
+      puts "Please assign a train for the route #{selected_route.stations.map(&:name).join(' -> ')}."
       display_trains
 
-      train_selection = gets.chomp.to_i
+      train_selection = user_choice.to_i
 
       if train_selection >= 1 && train_selection <= @trains.size
         selected_train = @trains[train_selection - 1]
         selected_train.assign_route(selected_route)
-        puts "Route #{selected_route.stations.map(&:name).join(' -> ')} assigned for the train No.#{selected_train.number}"
+        puts "Assigned route #{selected_route.stations.map(&:name).join(' -> ')} for the train №#{selected_train.number}"
       else
         puts 'Wrong selection.'
       end
@@ -359,56 +315,50 @@ class Main
     end
   end
 
+  # Используется для маршрутов поездов в методах
+  def display_routes
+    @routes_storage.each_with_index do |route, index|
+      station_names = route.stations.map(&:name).join(' -> ')
+      puts "#{index + 1}  -  Route #{station_names}"
+    end
+  end
+
   def move_train
     return puts 'No trains available.' if @trains.empty?
 
     puts 'Please select the train to operate:'
     display_trains
-    menu_selection = gets.chomp.to_i
+    menu_selection = user_choice.to_i
     return unless (1..@trains.size).include?(menu_selection)
 
     selected_train = @trains[menu_selection - 1]
     puts "Selected train: #{selected_train.number}"
 
-    puts "Please select an option:
-    1  -  Move to the next station
-    2  -  Move to the previous station
-    3  - Return"
+    @menu.move_train_menu
 
-    user_selection = gets.chomp.to_i
+    user_selection = user_choice.to_i
     case user_selection
     when 1
       selected_train.move_forward
     when 2
       selected_train.move_backward
     when 3
-      show_menu
+      @menu.show_menu
     else
-      show_menu
+      exit
     end
     puts "Train #{selected_train.number} has arrived at #{selected_train.current_station.name} station."
   end
 
-  # Added new features
   def show_all
-    if @stations.empty? && @trains.empty?
-      puts 'No stations and trains available.'
-      show_menu
-    elsif @stations.empty? && !@trains.empty?
-      puts 'No stations available, trains are at the depot.'
-    else
-      @stations.each do |station|
-        puts "Station: #{station.name}"
-        if station.trains.empty?
-          puts 'No trains at the station.'
-        else
-          puts 'Trains:'
-          station.iterate_through_trains do |train| # New method
-            train.iterate_through_carts do |cart| # New method
-            end
-          end
-        end
-      end
+    return puts 'No stations and trains available.' if @stations.empty? && @trains.empty?
+
+    @stations.each do |station|
+      puts "Station: #{station.name}"
+      next puts 'No trains at the station.' if station.trains.empty?
+
+      puts 'Trains:'
+      station.iterate_through_trains { |train| train.iterate_through_carts {} }
     end
   end
 end

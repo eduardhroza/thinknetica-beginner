@@ -9,7 +9,7 @@ class Station
   include InstanceCounter
   NUMBER_FORMAT = /^[a-zA-Z0-9]{1,58}$/.freeze
 
-  @@stations = []
+  @stations = []
 
   def initialize(name)
     @name = name.to_s
@@ -26,7 +26,7 @@ class Station
   end
 
   def self.all
-    @@stations
+    @stations
   end
 
   def add_train(train)
@@ -46,9 +46,9 @@ class Station
   end
 
   def send_train(train_number)
-    train = @trains.find { |train| train.number == train_number }
-    if train
-      @trains.delete(train)
+    target_train = @trains.find { |train| train.number == train_number }
+    if target_train
+      @trains.delete(target_train)
     else
       puts "Train with number #{train_number} not found at the station."
     end
@@ -72,7 +72,6 @@ class Station
 
   private
 
-  # Этот метод не будет вызываться из клиентского кода
   def trains_by_type(type)
     selected_trains = @trains.select { |train| train.type == type }
     puts "Trains of type #{type} at #{@name} station:"
