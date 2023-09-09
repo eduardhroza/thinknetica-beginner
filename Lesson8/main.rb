@@ -129,7 +129,7 @@ class Main
     route.remove_intermediate_station(selected_station)
   end
 
-  def operate_route_actions(route)
+  def operate_route_actions
     @menu.operate_route_menu
     sub_menu_selection = user_choice.to_i
 
@@ -299,7 +299,7 @@ class Main
       if train_selection >= 1 && train_selection <= @trains.size
         selected_train = @trains[train_selection - 1]
         selected_train.assign_route(selected_route)
-        puts "Assigned route #{selected_route.stations.map(&:name).join(' -> ')} for the train №#{selected_train.number}"
+        puts "Set route #{selected_route.stations.map(&:name).join(' -> ')} for the train №#{selected_train.number}"
       else
         puts 'Wrong selection.'
       end
