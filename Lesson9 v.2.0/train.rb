@@ -12,7 +12,6 @@ class Train
   include InstanceCounter
   NUMBER_FORMAT = /^[A-Za-z0-9]{3}-?[A-Za-z0-9]{2}$/.freeze
 
-  validate :number, :presence
   validate :number, :format, NUMBER_FORMAT
   validate :number, :type, String
 
