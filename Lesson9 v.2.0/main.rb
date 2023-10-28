@@ -159,6 +159,9 @@ class Main
     train = CargoTrain.new(number) if user_selection == 2
     puts "#{train.type.to_s.capitalize!} train with number #{number} was created."
     @trains << train
+  rescue StandardError => e
+    puts "An error occurred: #{e.message}"
+    retry
   end
 
   # Ниже этого комментария находятся методы для меню "Wagon management".

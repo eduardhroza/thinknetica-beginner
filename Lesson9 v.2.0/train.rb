@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative 'modules'
-require_relative 'validation'
 
 class Train
   attr_reader :number, :speed, :carts, :trains
