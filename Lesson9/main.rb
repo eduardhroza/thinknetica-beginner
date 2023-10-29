@@ -159,11 +159,8 @@ class Main
     train = CargoTrain.new(number) if user_selection == 2
     puts "#{train.type.to_s.capitalize!} train with number #{number} was created."
     @trains << train
-  rescue ArgumentError
-    puts 'Wrong train number, please try again:'
-    retry
   rescue StandardError => e
-    puts e.message
+    puts "An error occurred: #{e.message}"
     retry
   end
 

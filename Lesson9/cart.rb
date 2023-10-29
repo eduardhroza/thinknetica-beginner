@@ -33,5 +33,3 @@ class Cart
     raise errors.join('.') unless errors.empty?
   end
 end
-
-# rubocop:enable Style/ClassVars

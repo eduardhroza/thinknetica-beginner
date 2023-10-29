@@ -7,7 +7,11 @@ class Station
   attr_accessor :trains
 
   include InstanceCounter
+  include Validation
   NUMBER_FORMAT = /^[a-zA-Z0-9]{1,58}$/.freeze
+
+  validate :name, :presence
+  validate :name, :type, String
 
   @stations = []
 
@@ -16,13 +20,6 @@ class Station
     validate!
     @trains = []
     self.class.all << self
-  end
-
-  def validate!
-    errors = []
-    errors <<  "Name can't be empty." if name.nil? || name == ''
-    errors <<  'Invalid format.' unless name =~ NUMBER_FORMAT
-    raise errors.join('.') unless errors.empty?
   end
 
   def self.all

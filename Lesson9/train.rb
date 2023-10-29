@@ -6,9 +6,13 @@ class Train
   attr_reader :number, :speed, :carts, :trains
   attr_accessor :type
 
+  include Validation
   include Manufacturer
   include InstanceCounter
   NUMBER_FORMAT = /^[A-Za-z0-9]{3}-?[A-Za-z0-9]{2}$/.freeze
+
+  validate :number, :format, NUMBER_FORMAT
+  validate :number, :type, String
 
   def initialize(number)
     @number = number.to_s
@@ -19,14 +23,6 @@ class Train
     @current_station_index = nil
     @route = nil
     register_instance
-  end
-
-  def validate!
-    errors = []
-    errors << "Number can't be empty." if @number.nil? || number == ''
-    errors << 'Invalid format.' unless @number =~ NUMBER_FORMAT
-    errors << 'Type may be only passenger or cargo.' unless @type == :cargo || @type == :passenger
-    raise errors.join('.') unless errors.empty?
   end
 
   def self.find(train_number)
